@@ -1,9 +1,0 @@
-examples
-test
-.travis.yml
-.prettierrc
-tsconfig.json
-tslint.json
-src
-!index.js
-!index.d.ts
