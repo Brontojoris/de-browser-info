@@ -1,113 +1,42 @@
 # detect-browser
 
-This is a package that attempts to detect a browser vendor and version (in
-a semver compatible format) using a navigator useragent in a browser or
-`process.version` in node.
+This is a data element for Adobe Launch that attempts to detect a browser vendor and version using a navigator useragent in a browser. It is based on the [detect-browser package](https://github.com/DamonOehlman/detect-browser) by [Damian Oelman|https://github.com/DamonOehlman]
 
-[![NPM](https://nodei.co/npm/detect-browser.png)](https://nodei.co/npm/detect-browser/)
-
-[![stable](https://img.shields.io/badge/stability-stable-green.svg)](https://github.com/dominictarr/stability#stable) [![Build Status](https://api.travis-ci.org/DamonOehlman/detect-browser.svg?branch=master)](https://travis-ci.org/DamonOehlman/detect-browser) [![Maintainability](https://api.codeclimate.com/v1/badges/84947fce3f3b06da69d0/maintainability)](https://codeclimate.com/github/DamonOehlman/detect-browser/maintainability)
+The goal is to provide an easy way to identify regular browser, in-app webview browsers, social media in-app webviews, and bots/crawlers.
 
 ## Installation
 
-[![CDN](https://img.shields.io/badge/CDN-UNPKG-blue.svg)](https://unpkg.com/browse/detect-browser)
-
-[![NPM](https://img.shields.io/badge/Package-npm-purple.svg)](https://www.npmjs.com/package/detect-browser)
+1. Login to Adobe Launch
+2. Navigate to Data Elements
+3. Create a new data element
+4. Name it 'browser_info'
+4. Set Extension to Core
+5. Set Data Element Type to Custom Code
+6. Leave other values as defaults
+7. Paste the code into the Editor
+8. Build the working library
 
 ---
 
 ## Example Usage
 
-```js
-const { detect } = require('detect-browser');
-const browser = detect();
+`_satellite.getVar('browser_info')`
 
-// handle the case where we don't detect the browser
-if (browser) {
-  console.log(browser.name);
-  console.log(browser.version);
-  console.log(browser.os);
+
+Returns the following object:
+
+```
+{
+  agentId: 'chrome', // key for regex match in userAgentRules
+  browser: 'Chrome', // human readable label for the identified browser.
+  version: '84.0.4147', //browser version,
+  os: 'Mac OS',      Operating system matched,
+  deviceType: 'Desktop'
 }
 ```
+![Example of Browser Info data element output](example.png)
 
-Or you can use a switch statement:
-
-```js
-const { detect } = require('detect-browser');
-const browser = detect();
-
-// handle the case where we don't detect the browser
-switch (browser && browser.name) {
-  case 'chrome':
-  case 'firefox':
-    console.log('supported');
-    break;
-
-  case 'edge':
-    console.log('kinda ok');
-    break;
-
-  default:
-    console.log('not supported');
-}
-```
-
-Additionally, from `5.x` a `type` discriminator is included in the result
-should you want to use this (it's a nice convenience in a TS environment).
-
-Contrived example:
-
-```ts
-import { detect } from '../src';
-
-const result = detect();
-if (result) {
-  switch (result.type) {
-    case 'bot':
-      // result is an instanceof BotInfo
-      console.log(`found ${result.name} bot`);
-      break;
-
-    case 'bot-device':
-      // result is an instanceof SearchBotDeviceInfo
-      console.log(`found ${result.name} device bot`);
-      break;
-
-    case 'browser':
-      // result is an instanceof BrowserInfo
-      console.log(`found ${result.name} browser`);
-      break;
-
-    case 'node':
-      // result is an instanceof NodeInfo
-      console.log(`found node version ${result.version}`);
-      break;
-  }
-}
-```
-
-**NOTE:** In addition to the the `detect` function, `browserName` and
-`detectOS` are provided as exports if you want to only access certain
-information.
-
-## Adding additional browser support
-
-The current list of browsers that can be detected by `detect-browser` is
-not exhaustive. If you have a browser that you would like to add support for
-then please submit a pull request with the implementation.
-
-Creating an acceptable implementation requires two things:
-
-1. A test demonstrating that the regular expression you have defined identifies
-   your new browser correctly. Examples of this can be found in the
-   `test/logic.js` file.
-
-2. Write the actual regex to the `index.js` file. In most cases adding
-   the regex to the list of existing regexes will be suitable (if usage of `detect-brower`
-   returns `undefined` for instance), but in some cases you might have to add it before
-   an existing regex. This would be true for a case where you have a browser that
-   is a specialised variant of an existing browser but is identified as the
-   non-specialised case.
+### Note
 
 When writing the regular expression remember that you would write it containing a
 single [capturing group](https://regexone.com/lesson/capturing_groups) which
