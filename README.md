@@ -1,6 +1,6 @@
 # detect-browser
 
-This is a data element for Adobe Launch that attempts to detect a browser vendor and version using a navigator useragent in a browser. It is based on the [detect-browser package](https://github.com/DamonOehlman/detect-browser) by [Damian Oelman|https://github.com/DamonOehlman]
+This is a data element for Adobe Launch that attempts to detect a browser vendor and version using a navigator useragent in a browser. It is based on the [detect-browser package](https://github.com/DamonOehlman/detect-browser) by [Damian Oelman](https://github.com/DamonOehlman]
 
 The goal is to provide an easy way to identify regular browser, in-app webview browsers, social media in-app webviews, and bots/crawlers.
 
