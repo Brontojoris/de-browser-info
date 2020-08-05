@@ -21,12 +21,16 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-var browserLabel = {
+try{
+var userAgent = (typeof _ua !== 'undefined') ? _ua : navigator.userAgent,
+	browserLabel = {
 		android: 'Android Browser',
 		'ahrefs': 'AHrefs Bot',
 		aol: 'AOL Browser',
 		bb10: 'Blackberry 10',
 		beaker: 'Beaker',
+		belong: 'Belong App',
+		brave: 'Brave (Chrome)',
 		bing: 'Bing Bot',
 		crios: 'Chrome iOS',
 		chrome: 'Chrome',
@@ -39,6 +43,7 @@ var browserLabel = {
 		firefox: 'Firefox',
 		fxios: 'Firefox iOS',
 		googlebot : 'GoogleBot',
+		googlesearchapp: 'Google Search App',
 		instagram: 'Instagram Webview',
 		'ios-webview1': 'iOS Webview',
 		'ios-webview2': 'iOS Webview',
@@ -53,7 +58,8 @@ var browserLabel = {
 		opera2: 'Opera',
 		phantomjs: 'PhantomJS',
 		safari: 'Safari',
-		samsung: 'Samsung Internet Browser',
+		samsung1: 'Samsung Internet Browser',
+		samsung2: 'Samsung Internet Browser',
 		silk: 'Silk',
 		searchbot: 'Search Bot',
 		yandexbrowser: 'Yandex'
@@ -71,17 +77,17 @@ var browserLabel = {
 	},
 	userAgentRules = {
 		'aol': /AOLShield\/([0-9\._]+)/,
+		'belong': /BelongApp\/([0-9\._]+)/,
 		'edge': /Edge\/([0-9\._]+)/,
 		'edge-ios': /EdgiOS\/([0-9\._]+)/,
 		'yandexbrowser': /YaBrowser\/([0-9\._]+)/,
 		'kakaotalk': /KAKAOTALK\s([0-9\.]+)/,
-		'samsung': /SamsungBrowser\/([0-9\.]+)/,
+		'samsung1': /SamsungBrowser\/([0-9\.]+)/,
+		'samsung2': /SamsungBrowser\/CrossApp\/([0-9\.]+)/,
 		'silk': /\bSilk\/([0-9._-]+)\b/,
 		'miui': /MiuiBrowser\/([0-9\.]+)$/,
 		'beaker': /BeakerBrowser\/([0-9\.]+)/,
 		'edge-chromium': /Edg\/([0-9\.]+)/,
-		'chromium-webview': /(?!Chrom.*OPR)wv\).*Chrom(?:e|ium)\/([0-9\.]+)(:?\s|$)/,
-		'chrome': /(?!Chrom.*OPR)Chrom(?:e|ium)\/([0-9\.]+)(:?\s|$)/,
 		'phantomjs': /PhantomJS\/([0-9\.]+)(:?\s|$)/,
 		'crios': /CriOS\/([0-9\.]+)(:?\s|$)/,
 		'firefox': /Firefox\/([0-9\.]+)(?:\s|$)/,
@@ -93,19 +99,22 @@ var browserLabel = {
 		'ie2': /MSIE\s([0-9\.]+);.*Trident\/[4-7].0/,
 		'ie3': /MSIE\s(7\.0)/,
 		'bb10': /BB10;\sTouch.*Version\/([0-9\.]+)/,
-		'android': /Android\s([0-9\.]+)/,
-		'ios': /Version\/([0-9\._]+).*Mobile.*Safari.*/,
-		'safari': /Version\/([0-9\._]+).*Safari/,
 		'facebook': /FBAV\/([0-9\.]+)/,
+		'googlebot': /Googlebot|google web preview/,
+		'googlesearchapp': /\bGSA\/([0-9\.]+)/,
 		'instagram': /Instagram\s([0-9\.]+)/,
 		'ios-webview1': /AppleWebKit\/([0-9\.]+).*Mobile/,
 		'ios-webview2': /AppleWebKit\/([0-9\.]+).*Gecko\)$/,
-		'googlebot': /Googlebot|google web preview/,
-		'fb':/facebookexternalhit/,
-		'alexa':/ia_archiver/,
-		'ahrefs':/AhrefsBot/,
-		'bing':/BingBot|MSNBot/,
+		'fb': /facebookexternalhit/,
+		'chromium-webview': /(?!Chrom.*OPR)wv\).*Chrom(?:e|ium)\/([0-9\.]+)(:?\s|$)/,
+		'chrome': /(?!Chrom.*OPR)Chrom(?:e|ium)\/([0-9\.]+)(:?\s|$)/,
+		'alexa': /ia_archiver/,
+		'ahrefs': /AhrefsBot/,
+		'bing': /BingBot|MSNBot/,
 		'searchbot': /bot|crawl(er|ing)|feedburner|nagios|postrank|pingdom|slurp|spider|yahoo!|yandex/,
+        'android': /Android\s([0-9\.]+)/,
+		'ios': /Version\/([0-9\._]+).*Mobile.*Safari.*/,
+		'safari': /Version\/([0-9\._]+).*Safari/
 	},
 	operatingSystemRules = {
 		'iOS': /iP(hone|od|ad)/,
@@ -133,11 +142,6 @@ var browserLabel = {
 		'QNX': /QNX/,
 		'BeOS': /BeOS/,
 		'OS/2': /OS\/2/
-	},
-	createVersionParts = function(count) {
-		var output = [];
-		for (var ii = 0; ii < count; ii++) {output.push('0');}
-		return output;
 	},
 	matchUserAgent = function (ua) {
 		for (var agent in userAgentRules) {
@@ -169,7 +173,8 @@ var browserLabel = {
 	parseUserAgent = function(ua) {
 		var matchedRule = matchUserAgent(ua);
 		var agent = matchedRule.agent, match = matchedRule.match;
-		if (!agent) {return null;}
+		if (!agent) { return null }
+		if (navigator.brave){ agent = "brave" }
 		var versionParts = (match[1] && match[1].split(/[._]/).slice(0, 3));
 		var version = versionParts && versionParts.join('.');
 		var os = detectOS(ua);
@@ -179,5 +184,7 @@ var browserLabel = {
 			debug:{notice:'debug{} object is EOL',userAgent:ua, match:match}
 		}
 	};
-
-return parseUserAgent(navigator.userAgent)
+	return parseUserAgent(userAgent)
+}catch(err){
+	return {debug:err,agentId:undefined,browser:undefined,version:undefined,os:undefined,deviceType:undefined}
+}
